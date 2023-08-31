@@ -2,7 +2,6 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthService } from "./auth.service";
-import { GoogleStrategy } from "./google.startegy";
 import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./jwt.strategy";
 import { UserService } from "src/user/user.service";
@@ -18,7 +17,7 @@ import { EmailService } from "src/email/email.service";
         }),
        
     ],
-    providers: [AuthService, GoogleStrategy,JwtStrategy,UserService,EmailService],
+    providers: [AuthService,JwtStrategy,UserService,EmailService],
     exports: [AuthService],
     controllers:[AuthController]
 })

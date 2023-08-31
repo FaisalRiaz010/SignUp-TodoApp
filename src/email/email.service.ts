@@ -15,7 +15,7 @@ export class EmailService {
       },
     });
   }
-
+  //send email to user for verification
   async sendTestEmail(email: string, token: string): Promise<void> {
     try {
       const mailOptions = {
@@ -32,7 +32,7 @@ export class EmailService {
       throw new Error('Failed to send test email');
     }
   }
-
+  //send email to reset password
   async sendPasswordResetEmail(email: string, token: string): Promise<void> {
     try {
       const mailOptions = {

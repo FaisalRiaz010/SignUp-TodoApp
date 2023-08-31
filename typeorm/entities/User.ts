@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { PrimaryGeneratedColumn, Column, Entity, OneToMany, } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
 import { Todo } from './Todo';
 
 @Entity() // Add the @Entity() decorator
@@ -11,7 +11,6 @@ export class User {
   username: string;
   @Column({ default: 'default_email' }) // Set a default value for email
   email: string;
-  
 
   @Column()
   password: string;
@@ -26,10 +25,8 @@ export class User {
 
   @Column({ nullable: true }) // Add this column for 2FA secret key
   twoFactorSecret: string;
-  
-   //one to many relation that one user can create multiple todos
+
+  //one to many relation that one user can create multiple todos
   @OneToMany(() => Todo, (todo) => todo.user)
   todos: Todo[];
-
-  
 }

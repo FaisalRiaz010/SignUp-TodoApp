@@ -8,14 +8,17 @@ import * as speakeasy from 'speakeasy'; // Import the speakeasy library
 
 @Injectable()
 export class UserService {
+  public getTokenData(email: string): { token: string; expiration: Date } | undefined {
+    return this.tokenCache.get(email);
+    }
   private tokenCache: Map<string, { token: string; expiration: Date }> = new Map();
+ 
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
         
       ) {}
     
-      //function to create the user
      // Function to create a user with 2FA support
   async createUserWith2FA(createUserDto: CreateUserDto): Promise<User> {
     const { username, password, email } = createUserDto;
@@ -48,35 +51,33 @@ export class UserService {
 
     return user;
   }
+//function to verify user by token vs 2FA token
+async getVerifiedUser(token:string,token2FA:string):Promise<User>{
+  const user=await this.userRepository.findOne({
+    where:{
+      verificationToken:token,
+      twoFactorSecret:token2FA
+    }
+  })
+  user.isVerified = true;
+  return this.userRepository.save(user);
+}
 
      
-    
-   //email 
+   //login User
    async getUserByEmailAndPassword(email: string, password: string): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { email, password,isVerified:true } });
     
     console.log(user);
     return user || null;
   }
-    //function to verify
-    async getVerifiedUser(token:string,token2FA:string):Promise<User>{
-      const user=await this.userRepository.findOne({
-        where:{
-          verificationToken:token,
-          twoFactorSecret:token2FA
-        }
-      })
-      user.isVerified = true;
-      return this.userRepository.save(user);
-    }
-   
-    //set token cache 
-    async storeResetPasswordToken(email: string, token: string): Promise<void> {
+    
+   //set token cache usng in auth service where reset password logic is presnt
+    async storeResetPasswordToken(email: string, token: string,expiration: Date): Promise<void> {
       // Store the token and its expiration date in memory (tokenCache)
-      const expiration = new Date();
-      expiration.setHours(expiration.getHours() + 1);
-  
+  console.log("cached token",token,expiration);
       this.tokenCache.set(email, { token, expiration });
     }
     
+  
 }
