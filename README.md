@@ -18,6 +18,9 @@ This is a NestJS project that allows users to sign up, login,using 2FA more secu
 1. Install the dependencies:
 
 npm install
+npm install typeorm --save (for typeorm)
+npm i speakeasy (library for the 2FA )
+
 
 
 2. Start the development server:
