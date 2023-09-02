@@ -32,6 +32,7 @@ export class EmailService {
       throw new Error('Failed to send test email');
     }
   }
+  
   //send email to reset password
   async sendPasswordResetEmail(email: string, token: string): Promise<void> {
     try {

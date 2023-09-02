@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -22,6 +23,7 @@ import {
 import { EmailService } from 'src/email/email.service';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dtos/CreateUser.dto';
+import { User } from 'typeorm/entities/User';
 
 @ApiTags('users') // Adds a tag to the Swagger documentation for this controller
 @Controller('users')
@@ -44,19 +46,25 @@ export class UsersController {
     description: 'The user has been successfully registered.',
     type: CreateUserDto,
   })
+  //reister user
+  @Post('register')
   async registerUser(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<{ user: CreateUserDto; verificationToken: string }> {
-    const user = await this.usersService.createUserWith2FA(createUserDto);
+  ): Promise<{ user: CreateUserDto; verificationToken: string; qrcodeUrl: string }> {
+    const { user, qrcodeDataUrl } = await this.usersService.createUserWith2FA(createUserDto);
+
+    // Generate the QR code for 2FA
+    const qrcodeUrl = qrcodeDataUrl;
+ 
 
     try {
       // Send the verification email
-      const emailTemplate =
-        `
-        <p>Thank you for registering with our SignUp service. Please click the link below to verify your email address:</p>
-        <a href="http://localhost:5000/api#/users/UsersController_verifyUser/${user.verificationToken}" Put this token in Feild>Verify Email</a>
-      ` +
-        `OR ${user.verificationToken} copy token from here And put in your swagger field `;
+      const emailTemplate = `
+      <p>Thank you for registering with our SignUp service. Please click the link below to verify your email address:</p>
+      <a href="http://localhost:5000/api/users/verifyUser /${user.verificationToken}">Verify Email</a>
+      <br/>
+      <img src="${qrcodeUrl}" alt="QR Code" />
+      `;
 
       await this.emailService.sendTestEmail(user.email, emailTemplate);
     } catch (error) {
@@ -71,24 +79,39 @@ export class UsersController {
     return {
       user,
       verificationToken: user.verificationToken,
+      qrcodeUrl,
     };
   }
 
   // Account verification
-  @Get('verify/:token')
+  @Get('verify/:verificationToken/:codeFromGoogleAuthenticator')
+  @ApiOperation({ summary: 'Verify user using verification token and Google Authenticator code' })
+  @ApiResponse({ status: 200, description: 'User verified successfully' })
+  @ApiResponse({ status: 400, description: 'User not found or token expired' })
+  @ApiResponse({ status: 401, description: 'Invalid code from Google Authenticator' })
+  @ApiParam({ name: 'verificationToken', type: 'string', description: 'User verification token' })
+  @ApiParam({ name: 'codeFromGoogleAuthenticator', type: 'string', description: 'Code from Google Authenticator' })
   async verifyUser(
-    @Param('token') token: string,
-    @Param('token2FA') token2FA: string,
-  ) {
-    // Find the user by the verification token
-    const user = await this.usersService.getVerifiedUser(token, token2FA);
+    @Param('verificationToken') verificationToken: string,
+    @Param('codeFromGoogleAuthenticator') codeFromGoogleAuthenticator: string,
+  ): Promise<User> {
+    try {
+      // Verify the user with the provided tokens
+      const user = await this.usersService.verifyUserByTokens(verificationToken, codeFromGoogleAuthenticator);
 
-    if (!user) {
-      // Handle case where user is not found
-      return 'Verification failed: User not found or token expired.';
+      // If verification is successful, you can return the user or any relevant data
+      return user;
+    } catch (error) {
+      // Handle exceptions and return appropriate responses
+      if (error instanceof NotFoundException) {
+        throw new HttpException('User not found or token expired.', HttpStatus.BAD_REQUEST);
+      } else if (error instanceof UnauthorizedException) {
+        throw new HttpException('Invalid code from Google Authenticator.', HttpStatus.UNAUTHORIZED);
+      } else {
+        // Handle other unexpected errors
+        throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
-    // Redirect or respond to the client indicating successful verification
-    return `Verification successful: Your account with username "${user.username}" is now verified.`;
   }
 
   // For email Verification

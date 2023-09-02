@@ -1,66 +1,93 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'typeorm/entities/User';
 import { CreateUserDto } from './dtos/CreateUser.dto';
 import * as speakeasy from 'speakeasy'; // Import the speakeasy library
+import * as qrcode from 'qrcode';
 
 @Injectable()
 export class UserService {
   public getTokenData(email: string): { token: string; expiration: Date } | undefined {
     return this.tokenCache.get(email);
-    }
-  private tokenCache: Map<string, { token: string; expiration: Date }> = new Map();
- 
+  }
+  private tokenCache: Map<string, { token: string; expiration: Date }> = new Map();//in-memory cache to store token in cache 
+
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
         
       ) {}
     
-     // Function to create a user with 2FA support
-  async createUserWith2FA(createUserDto: CreateUserDto): Promise<User> {
-    const { username, password, email } = createUserDto;
-
-    // Check if the user exists in the database
-    const userInDb = await this.userRepository.findOne({
-      where: { username },
-    });
-
-    if (userInDb) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
-    }
-
-    // Generate a unique verification token
-    const verificationToken = speakeasy.generateSecret().base32;
-
-    // Generate a unique 2FA secret key
-    const twoFactorSecret = speakeasy.generateSecret().base32;
-
-    const user = this.userRepository.create({
-      username,
-      password,
-      email,
-      verificationToken,
-      twoFactorSecret, // Store the 2FA secret key in the database
-    });
-
-    // Save the user to the database
-    await this.userRepository.save(user);
-
-    return user;
-  }
+      async createUserWith2FA(createUserDto: CreateUserDto): Promise<{ user: User; qrcodeDataUrl: string }> {
+        const { username, password, email } = createUserDto;
+    
+        // Check if the user exists in the database
+        const userInDb = await this.userRepository.findOne({
+          where: { username },
+        });
+    
+        if (userInDb) {
+          throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+        }
+    
+        // Generate a unique verification token
+        const verificationToken = speakeasy.generateSecret().base32;
+    
+        // Generate a unique 2FA secret key
+        const twoFactorSecret = speakeasy.generateSecret().base32;
+    
+        // Generate the full QR code URL for display
+        const otpauthUrl = `otpauth://totp/${username}?secret=${twoFactorSecret}&issuer=signupApp`;
+        // Generate the QR code image using the full URL
+        const qrcodeDataUrl = await qrcode.toDataURL(otpauthUrl, {
+          errorCorrectionLevel: 'H',
+          margin: 1,
+        });
+    
+        // Create the user entity
+        const user = this.userRepository.create({
+          username,
+          password,
+          email,
+          verificationToken,
+          twoFactorSecret,
+          
+        });
+    
+        // Save the user entity
+        await this.userRepository.save(user);
+    
+        return { user, qrcodeDataUrl };
+      }
 //function to verify user by token vs 2FA token
-async getVerifiedUser(token:string,token2FA:string):Promise<User>{
-  const user=await this.userRepository.findOne({
-    where:{
-      verificationToken:token,
-      twoFactorSecret:token2FA
-    }
-  })
+async verifyUserByTokens(verificationToken: string, codeFromGoogleAuthenticator: string): Promise<User> {
+  // Find the user by the verification token
+  const user = await this.userRepository.findOne({
+    where: { verificationToken },
+  });
+
+  if (!user) {
+    throw new NotFoundException('User not found or token expired.');
+  }
+
+  // Verify the code received from Google Authenticator
+  const isCodeValid = speakeasy.totp.verify({
+    secret: user.twoFactorSecret,
+    encoding: 'base32',
+    token: codeFromGoogleAuthenticator,
+  });
+
+  if (!isCodeValid) {
+    throw new UnauthorizedException('Invalid code from Google Authenticator.');
+  }
+
+  // Mark the user as verified (if needed)
   user.isVerified = true;
-  return this.userRepository.save(user);
+  await this.userRepository.save(user);
+
+  return user;
 }
 
      

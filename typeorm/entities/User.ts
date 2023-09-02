@@ -22,10 +22,11 @@ export class User {
   verificationToken: string;
   verification: any;
   static verificationToken: string;
-
-  @Column({ nullable: true }) // Add this column for 2FA secret key
+  @Column({ default: '' })
   twoFactorSecret: string;
-
+  
+  @Column({ type: 'varchar', length: 4096, default:'' }) // Increased length
+qrcodeUrl: string;
   //one to many relation that one user can create multiple todos
   @OneToMany(() => Todo, (todo) => todo.user)
   todos: Todo[];
