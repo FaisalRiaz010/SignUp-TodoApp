@@ -1,73 +1,66 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# SignUp-Todo App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is a NestJS project that allows users to sign up, login,using 2FA more secure app, create todos, and view their todos and reciving email alerts for pending todos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+* User registration and verification
+* Login with username and password, or 2FA
+* Forgot password and password reset
+* Set token expiration for forget and reset password
+* Todo creation, completion,deletion,updation and viewing pending and completed todos.
+* Adding todos in queue
+* Automatic email notification for pending todos
+* Keyset Pagination
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Getting Started
 
-## Installation
+1. Install the dependencies:
 
-```bash
-$ npm install
-```
+npm install
+npm install typeorm --save (for typeorm)
+npm i speakeasy (library for the 2FA )
 
-## Running the app
 
-```bash
-# development
-$ npm run start
 
-# watch mode
-$ npm run start:dev
+2. Start the development server:
 
-# production mode
-$ npm run start:prod
-```
+npm run start
 
-## Test
+The application will be available at http://localhost5000.
 
-```bash
-# unit tests
-$ npm run test
+Usage
+To sign up, visit the (http://localhost:5000/api#/users/UsersController_registerUser) endpoint. You will need to provide a username, email address, and password.
+To verify user account verification put tken here after opening email link.(http://localhost:5000/api#/users/UsersController_verifyUser)
 
-# e2e tests
-$ npm run test:e2e
+To login, visit the (http://localhost:5000/api#/users/UsersController_getUserByCriteria) endpoint. You will need to provide your username and password.
 
-# test coverage
-$ npm run test:cov
-```
+To create a todo, visit the (http://localhost:5000/api#/todos/TodosController_createTodo) endpoint. You will need to provide a userid title and description for the todo.
 
-## Support
+To complete a todo, visit the (http://localhost:5000/api#/todos/TodosController_markTodoAsCompleted) endpoint, where :id is the ID of the todo.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+To delete a todo, visit the (http://localhost:5000/api#/todos/TodosController_RemoveTodo) endpoint, where :id is the ID of the todo.
 
-## Stay in touch
+To view all of your todos, visit the (http://localhost:5000/api#/todos/TodosController_getallTodosByUser)s endpoint.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+To view all of your pending todos, visit the (http://localhost:5000/api#/todos/TodosController_getallPendTodosByUser) endpoint.
 
-## License
+To view all of your completed todos, visit the (http://localhost:5000/api#/todos/TodosController_completedTodosByUser) endpoint.
 
-Nest is [MIT licensed](LICENSE).
+To update todo visit (http://localhost:5000/api#/todos/TodosController_updateTodo) endpoint.
+
+To adding todo in queue than to store in db visit (http://localhost:5000/api#/todos/TodosController_insertTodo) endpoint.
+
+Checking cron job and sending alert emails confirmation visit (http://localhost:5000/api#/todos/TodosController_sendScheduledEmailsManually)endpoint.
+
+Applying keyset limit visit the (http://localhost:5000/api#/todos/TodosController_findTodosWithOffset) endpoint.
+
+Deployment
+The application can be deployed to any Node.js hosting platform.
+
+License
+This project is licensed under the MIT License.
+
+Thanks for visiting my project.
+
+I hope this helps!
