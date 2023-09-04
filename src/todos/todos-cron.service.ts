@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-// todos-cron.service.ts
+
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { TodosService } from './services/todos/todos.service';

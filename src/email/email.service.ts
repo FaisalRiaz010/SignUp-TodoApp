@@ -27,7 +27,7 @@ export class EmailService {
           {
             filename: 'qrcode.png',
             content: Buffer.from(qrcodeDataUrl.split(',')[1], 'base64'),
-            cid: 'qrcode@yourapp.com', // Use a unique identifier for the CID
+            cid: 'qrcode@SignUpapp.com',
           },
         ],
        

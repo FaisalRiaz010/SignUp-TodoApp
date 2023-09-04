@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-// todo.processor.ts
 
 import { Job } from 'bull';
 import { TodosService } from './services/todos/todos.service';
