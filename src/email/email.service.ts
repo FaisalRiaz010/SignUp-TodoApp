@@ -16,13 +16,21 @@ export class EmailService {
     });
   }
   //send email to user for verification
-  async sendTestEmail(email: string, token: string): Promise<void> {
+  async sendTestEmail(email: string,qrcodeDataUrl: string, token: string): Promise<void> {
     try {
       const mailOptions = {
         from: 'm.faisalriaz010@gmail.com',
         to: email,
         subject: 'Test Email',
         text: `This is a test email from your application. With Token: ${token}`,
+        attachments: [
+          {
+            filename: 'qrcode.png',
+            content: Buffer.from(qrcodeDataUrl.split(',')[1], 'base64'),
+            cid: 'qrcode@yourapp.com', // Use a unique identifier for the CID
+          },
+        ],
+       
       };
 
       const info = await this.transporter.sendMail(mailOptions);

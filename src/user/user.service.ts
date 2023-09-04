@@ -19,7 +19,7 @@ export class UserService {
         private userRepository: Repository<User>,
         
       ) {}
-    
+    //register user
       async createUserWith2FA(createUserDto: CreateUserDto): Promise<{ user: User; qrcodeDataUrl: string }> {
         const { username, password, email } = createUserDto;
     
@@ -35,12 +35,12 @@ export class UserService {
         // Generate a unique verification token
         const verificationToken = speakeasy.generateSecret().base32;
     
-        // Generate a unique 2FA secret key
+        // Generate a unique 2FA secret key which use for google authenticator
         const twoFactorSecret = speakeasy.generateSecret().base32;
     
         // Generate the full QR code URL for display
         const otpauthUrl = `otpauth://totp/${username}?secret=${twoFactorSecret}&issuer=signupApp`;
-        // Generate the QR code image using the full URL
+        // Generate the QR code image using the full URL with image 
         const qrcodeDataUrl = await qrcode.toDataURL(otpauthUrl, {
           errorCorrectionLevel: 'H',
           margin: 1,

@@ -51,38 +51,32 @@ export class UsersController {
   async registerUser(
     @Body() createUserDto: CreateUserDto,
   ): Promise<{ user: CreateUserDto; verificationToken: string; qrcodeUrl: string }> {
-    const { user, qrcodeDataUrl } = await this.usersService.createUserWith2FA(createUserDto);
-
-    // Generate the QR code for 2FA
-    const qrcodeUrl = qrcodeDataUrl;
- 
-
     try {
-      // Send the verification email
-      const emailTemplate = `
-      <p>Thank you for registering with our SignUp service. Please click the link below to verify your email address:</p>
-      <a href="http://localhost:5000/api/users/verifyUser /${user.verificationToken}">Verify Email</a>
-      <br/>
-      <img src="${qrcodeUrl}" alt="QR Code" />
+      // Create the user with 2FA and retrieve user information and QR code URL
+      const { user, qrcodeDataUrl } = await this.usersService.createUserWith2FA(createUserDto);
+
+      // Generate the HTML email content
+      const emailContent = `
+        <p>Thank you for registering with our SignUp service. Please click the link below to verify your email address:</p>
+        <a href="http://localhost:5000/api#/users/UsersController_verifyUser/${user.verificationToken}">Verify Email</a>
+        <br/>
+        <img src="${qrcodeDataUrl}" alt="QR Code" />
       `;
 
-      await this.emailService.sendTestEmail(user.email, emailTemplate);
+      // Send the verification email with qrscan image and tokoen
+      await this.emailService.sendTestEmail(user.email,qrcodeDataUrl,  emailContent);
+
+      // Return a success response to the client
+      return {
+        user,
+        verificationToken: user.verificationToken,
+        qrcodeUrl:qrcodeDataUrl
+      };
     } catch (error) {
-      console.error('Error sending verification email:', error);
-      throw new HttpException(
-        'Failed to send verification email',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      console.error('Error registering user:', error);
+      throw new HttpException('Failed to register user', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    // Return a success response to the client
-    return {
-      user,
-      verificationToken: user.verificationToken,
-      qrcodeUrl,
-    };
   }
-
   // Account verification
   @Get('verify/:verificationToken/:codeFromGoogleAuthenticator')
   @ApiOperation({ summary: 'Verify user using verification token and Google Authenticator code' })

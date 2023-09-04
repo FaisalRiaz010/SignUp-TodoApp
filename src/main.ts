@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Swagger setup
   const config = new DocumentBuilder()
-  .setTitle('Sign Application')
+  .setTitle('SignUp-TOdo Application')
   .setDescription('API for managing user')
   .setVersion('1.0')
   .addTag('SignUp')
