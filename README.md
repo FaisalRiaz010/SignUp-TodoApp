@@ -5,7 +5,7 @@ This is a NestJS project that allows users to sign up, login,using 2FA more secu
 ## Features
 
 * User registration and verification
-* Login with username and password, or 2FA
+* Login with username and password, or 2FA using google authenticator
 * Forgot password and password reset
 * Set token expiration for forget and reset password
 * Todo creation, completion,deletion,updation and viewing pending and completed todos.
@@ -20,6 +20,8 @@ This is a NestJS project that allows users to sign up, login,using 2FA more secu
 npm install
 npm install typeorm --save (for typeorm)
 npm i speakeasy (library for the 2FA )
+import * as qrcode from 'qrcode'; for generating qr code.
+
 
 
 
