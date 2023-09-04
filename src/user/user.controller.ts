@@ -13,7 +13,6 @@ import {
 import { UserService } from './user.service';
 import {
   ApiOperation,
-  ApiBody,
   ApiResponse,
   ApiTags,
   ApiOkResponse,
@@ -34,18 +33,6 @@ export class UsersController {
     private readonly emailService: EmailService,
   ) {}
 
-  // Function to register a new user with 2FA
-  @Post('register')
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiBody({
-    type: CreateUserDto,
-    description: 'User object with username and password',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'The user has been successfully registered.',
-    type: CreateUserDto,
-  })
   //reister user
   @Post('register')
   async registerUser(
@@ -123,7 +110,7 @@ export class UsersController {
   })
   @ApiOkResponse({ description: 'User found', type: String })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async getUserByCriteria(
+  async loginUser(
     @Param('email') email: string,
     @Param('password') password: string,
   ): Promise<string | null> {
