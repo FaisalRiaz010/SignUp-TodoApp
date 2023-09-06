@@ -180,11 +180,20 @@ export class TodosController {
     }
   }
   //check usng pagination keyset and offset
-  @Get('keyset')
+  @Get('Offset')
   async findTodosWithOffset(
-    @Query('lastId') lastId: number, //apllying query to check on limits and id check
+    @Query('offset') offset: number, //apllying query to check on limits and id check
     @Query('limit') limit: number,
   ): Promise<Todo[]> {
-    return this.todosService.findTodosWithOffset(lastId, limit);
+    return this.todosService.findTodosWithOffset(offset, limit);
+  }
+
+  //keyset
+  @Get('Keyset')
+  async findTodosWithKeyset(
+    @Query('LastId') lastId: number, //apllying query to check on limits and id check
+    @Query('limit') limit: number,
+  ): Promise<Todo[]> {
+    return this.todosService.findTodosWithKeyset(lastId, limit);
   }
 }

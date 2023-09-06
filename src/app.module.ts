@@ -8,6 +8,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { TodosModule } from './todos/todos.module';
 import { Todo } from 'typeorm/entities/Todo';
+import { Comment } from 'typeorm/entities/comments';
+import { CommentController } from './comments/comments.controller';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -18,10 +21,10 @@ import { Todo } from 'typeorm/entities/Todo';
       username: 'root',
       password: 'root',
       database: 'signup',
-      entities: [User,Todo], // Add entity
+      entities: [User,Todo,Comment], // Add entity
        synchronize: true,
-    }), UsersModule, AuthModule,TodosModule],
-  controllers: [AppController],
+    }), UsersModule, AuthModule,TodosModule, CommentsModule],
+  controllers: [AppController, CommentController],
   providers: [AppService],
 })
 export class AppModule {}

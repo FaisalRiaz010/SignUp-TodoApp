@@ -7,16 +7,18 @@ import { CreateUserDto } from './dtos/CreateUser.dto';
 import * as speakeasy from 'speakeasy'; // Import the speakeasy library
 import * as qrcode from 'qrcode';
 
+
 @Injectable()
 export class UserService {
   public getTokenData(email: string): { token: string; expiration: Date } | undefined {
     return this.tokenCache.get(email);
-  }
+  }//make public to get TOken data from cache using email as a key
   private tokenCache: Map<string, { token: string; expiration: Date }> = new Map();//in-memory cache to store token in cache 
 
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+       
         
       ) {}
     //register user

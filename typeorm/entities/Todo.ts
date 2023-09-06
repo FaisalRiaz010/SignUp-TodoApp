@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
+import { Comment } from './comments';
 @Entity() // Add the @Entity() decorator
 export class Todo {
   @PrimaryGeneratedColumn()
@@ -22,4 +23,7 @@ export class Todo {
   //build many to one relation with user that specific user by using id create todo
   @ManyToOne(() => User, (user) => user.todos)
   user: User;
+  //create relation with comment 
+  @OneToMany(() => Comment, (comment) => comment.commentableTodo)
+  comments: Comment[];
 }

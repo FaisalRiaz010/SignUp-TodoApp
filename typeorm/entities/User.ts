@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
 import { Todo } from './Todo';
+import { Comment } from './comments';
 
 @Entity() // Add the @Entity() decorator
 export class User {
@@ -30,4 +31,7 @@ qrcodeUrl: string;
   //one to many relation that one user can create multiple todos
   @OneToMany(() => Todo, (todo) => todo.user)
   todos: Todo[];
+  //relation with comment
+  @OneToMany(() => Comment, (comment) => comment.commentableUser)
+  comments: Comment[];
 }

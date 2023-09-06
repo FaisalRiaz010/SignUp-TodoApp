@@ -29,5 +29,6 @@ import { EmailService } from 'src/email/email.service';
     TodoCronService,
     EmailService,
   ],
+  exports:[TypeOrmModule,TodosModule]
 })
 export class TodosModule {}

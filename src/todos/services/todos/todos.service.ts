@@ -182,7 +182,20 @@ export class TodosService {
   }
 
   //OFSET PAGINATION
-  async findTodosWithOffset(lastId: number, limit: number): Promise<Todo[]> {
+  async findTodosWithOffset(offset: number, limit: number): Promise<Todo[]> {
+    const todos = await this.todoRepository.find({
+      relations: ['user'],
+      skip: offset,
+      take: limit,
+      order: {
+        id: 'ASC',
+      },
+    });
+    console.log(todos);
+    return todos;
+  }
+  //keySet
+  async findTodosWithKeyset(lastId: number, limit: number): Promise<Todo[]> {
     const todos = await this.todoRepository.find({
       relations: ['user'],
       where: {
@@ -196,4 +209,5 @@ export class TodosService {
     console.log(todos);
     return todos;
   }
+  
 }
